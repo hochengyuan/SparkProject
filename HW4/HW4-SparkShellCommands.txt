@@ -1,0 +1,23 @@
+// Activate Spark Interactive Shell
+spark-shell
+
+// load the dataset
+val inputFile = sc.textFile("/user/cyh359/BDAD/HW4/devicestatus.txt")
+
+val cleanFile = inputFile.
+// Filter out line longer than 20
+filter(line => line.length > 20).
+// the 19th character is delimiter 
+map(line => line.split(line.charAt(19))).
+// drop records that do not contain 14 values.
+filter(values => values.length == 14)
+
+// Extract the date (first field), mfr_model (second field), device ID (third field), and latitude and longitude (13th and 14th fields respectively)
+val extractData = cleanFile.
+map(values => (values(0) , values(1).split(' ')(0) , values(2) , values(12) , values(13)))
+
+// Save etl file
+extractData.
+map(values => values.toString).
+map(x => x.substring(1 , x.length - 1)).
+saveAsTextFile("/user/cyh359/BDAD/HW4/loudacre/devstatus/devicestatus_etl")

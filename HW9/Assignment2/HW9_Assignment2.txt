@@ -1,0 +1,19 @@
+// a. Challenge 1
+scala> val QuestionA = accounts.map(line => line.split(',')).keyBy(a => a(8))
+
+// display part of result in Challenge 1
+scala> QuestionA.take(3)
+
+// b. Challenge 2
+scala> val QuestionB = QuestionA.groupByKey().mapValues( s => (s.map(a => (a(3),a(4)))))
+
+// display part of result in Challenge 2
+scala> QuestionB.take(3).foreach(println)
+
+// c. Challenge 3
+scala> val Q_B_Sorted = QuestionB.sortBy(_._1)
+
+scala> val QuestionC = Q_B_Sorted.map(s => ("---" + s._1 , s._2.map(name => name._1 + "," + name._2)))
+
+// display first five postal codes and names
+scala> QuestionC.take(5).foreach(s => (println(s._1), s._2.foreach(println))) 

@@ -1,0 +1,40 @@
+spark-shell
+
+import scala.xml._
+
+// input the data
+val xmlData = sc.wholeTextFiles("/user/cyh359/BDAD/HW5/loudacre/activations")
+// RDD[(String , String)]
+
+// adopt the code in the slide of guide
+def getactivations(xmlstring: String): Iterator[Node] = {
+val nodes = XML.loadString(xmlstring) \\ "activation"
+nodes.toIterator
+} 
+// getactivation: (xmlstring: String)Iterator[scala.xml.Node]
+
+// Given an activation record (XML Node), return the model name
+def getmodel(activation: Node): String = {
+(activation \ "model").text
+} 
+// getmodel: (activation: scala.xml.Node)String
+
+
+// Given an activation record (XML Node), return the account number
+def getaccount(activation: Node): String = {
+(activation \ "account-number").text
+}
+// getaccount: (activation: scala.xml.Node)String
+
+// combine together
+val xmlFlatten = xmlData.flatMap(line => List(line._2))
+// RDD[String] = MapPartitionsRDD[2] at flatMap
+
+// flatten to make the iterator
+val xmlIterator = xmlFlatten.flatMap(getactivations)
+
+// Map each activation record to a string in the format: account-number:model
+val accNumModel = xmlIterator.map(instance => getaccount(instance) + ':' + getmodel(instance))
+
+// Save the formatted strings to a text file in the directory /loudacre/activations/account-models
+accNumModel.saveAsTextFile("/user/cyh359/BDAD/HW5/loudacre/account-models")

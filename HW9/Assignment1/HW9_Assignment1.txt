@@ -1,0 +1,28 @@
+scala> val accounts = sc.textFile("/user/cyh359/BDAD/HW7/loudacre/accounts/*")
+
+scala> val weblog = sc.textFile("/user/cyh359/BDAD/HW7/loudacre/2014-03-15.log")
+
+scala> val weblogMapping = weblog.map(line => line.split(' ')).map(field => (field(2) , 1))
+
+scala> val weblogReducing = weblogMapping.reduceByKey( (v1 , v2) => v1 + v2 )
+
+scala> val userDataPre = accounts.map(line => line.split(",")).map(field => (field(0) , Array(field(0) , field(1) , field(2) , field(3) , field(4) , field(5) , field(6) , field(7) , field(8) , field(9) , field(10), field(11))))
+
+// meet the format of Question 1
+scala> val userData = userDataPre.map( line => ( line._1 , line._2.mkString("[" , "," , "]" ) ) )
+
+// save userData to text file in HDFS
+scala> userData.saveAsTextFile("/user/cyh359/BDAD/HW7/loudacre/question1")
+
+scala> val id_hit = userData join weblogReducing
+
+// save id_hit(Question2) to text file in HDFS
+scala> id_hit.saveAsTextFile("/user/cyh359/BDAD/HW7/loudacre/question2")
+
+scala> val q3_pre = (userDataPre join weblogReducing).map(line => (line._1 , line._2._2 , line._2._1(3) , line._2._1(4) ) )
+
+scala> val q3 = q3_pre.map(line => line.toString).map( s => s.substring(1,s.length-1) ).map(x => x.replace("," , " ") )
+
+// Question3: Display the user ID, hit count, first name (3rd value), and last name (4th value) for the first 5 users
+scala> q3.take(5).foreach(println)
+

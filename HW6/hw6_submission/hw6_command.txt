@@ -1,0 +1,37 @@
+spark-shell
+
+a. 
+scala> val weblog = sc.textFile("/user/cyh359/BDAD/HW6/loudacre/2014-03-15.log") // count = 7097
+scala> val mapping = weblog.map(line => line.split(' ')).map(field => (field(2) , 1)) // count = 7097
+scala> mapping.count
+res130: Long = 7097
+scala> mapping.saveAsTextFile("/user/cyh359/BDAD/HW6/loudacre/questionA")
+
+b.
+scala> val reducing = mapping.reduceByKey( (v1 , v2) => v1 + v2 )
+scala> reducing.count
+res131: Long = 2311
+scala> 	reducing.saveAsTextFile("/user/cyh359/BDAD/HW6/loudacre/questionB")
+
+c.
+scala> val mapFreq = reducing.map(line => (line._2 , 1)) // (Freq , 1)
+scala> val reduceFreq = mapFreq.reduceByKey( (v1 , v2 ) => v1 + v2 ) // (Freq , Counter) // count = 13
+scala> val appear = reduceFreq.map(line => ( "(" + (line._1).toString + ":" + (line._2).toString + ")" ) ) // "(Freq:Counter)"
+scala> appear.count
+res132: Long = 13
+scala> appear.saveAsTextFile("/user/cyh359/BDAD/HW6/loudacre/questionC")
+
+d.
+scala> val account = sc.wholeTextFiles("/user/cyh359/BDAD/HW6/loudacre/accounts") // Array(String , String) // count = 7
+scala> val wholelist = account.map(line => line._2) // Array[String] // Array(string) // count = 7
+scala> val wholeline = wholelist.flatMap(line => line.split('\n')) // Array(string) // count = 129764
+scala> val valid_id = wholeline.map( line => (line.split(',')(0) , 1) ).distinct() // count = 129764
+
+// map valid id for pair(id,ip)
+scala> val id_ip_all = weblog.map(line => line.split(' ')).map(field => ( field(2) , field(0))) // (ID , IP) // count = 7097
+scala> val id_ip_list = id_ip_all.groupByKey() // Array(String , Iterable[String])  // count = 2311
+scala> val valid_id_ip = valid_id.join(id_ip_list).map{ case(k , (_ , v2)) => (k , v2) } // count = 2311
+scala> val valid_id_ip_dict = valid_id_ip.map(line => ( line._1 , line._2.toString.replace("CompactBuffer" , "").replace("(","[").replace(")","]"))) // (useridX , [ip])
+scala> valid_id_ip.count
+res133: Long = 2311
+scala> valid_id_ip_dict.saveAsTextFile("/user/cyh359/BDAD/HW6/loudacre/questionD")

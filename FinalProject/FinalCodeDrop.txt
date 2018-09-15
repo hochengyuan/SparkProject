@@ -1,0 +1,603 @@
+// Terminal
+spark-shell --packages com.databricks:spark-csv_2.10:1.5.0
+
+// Initialization
+scala> import org.apache.spark.SparkContext
+scala> import org.apache.spark.SparkContext._
+scala> import org.apache.spark.SparkConf
+scala> import scala.collection.mutable.ArrayBuffer
+scala> import org.apache.spark.sql.SQLContext
+scala> import org.apache.spark.sql.types._
+scala> import org.apache.spark.sql.functions.col
+scala> val sqlContext = new SQLContext(sc)
+scala> import sqlContext._
+scala> import sqlContext.implicits._
+scala> import org.apache.spark.sql.functions._
+scala> val toInt    = udf[Int, String]( _.toInt)
+scala> val toDouble = udf[Double, String]( _.toDouble)
+scala> val toHour   = udf((t: String) => "%04d".format(t.toInt).take(2).toInt ) 
+scala> val toFloat = udf[Float , String](_.toFloat)
+scala> import org.apache.spark.sql.functions.regexp_replace
+
+
+
+// Load csv files to dataframe
+// RentPrice
+scala> val priceRentRaw = sqlContext.read.format("com.databricks.spark.csv").option("header", "true").load("/user/cyh359/BDAD/Project/rawData/priceData/E2_medianAskingRent_All.csv")
+// Cast String Type to Float Type for the priceDataset_Rent
+// remove rows contain empty string
+scala> val priceRentRaw2 = priceRentRaw.filter(($"2010-01" !== "") && ($"2010-01" !== " ")).filter(($"2010-02" !== "") && ($"2010-02" !== " ")).filter(($"2010-03" !== "") && ($"2010-03" !== " ")).filter(($"2010-04" !== "") && ($"2010-04" !== " ")).filter(($"2010-05" !== "") && ($"2010-05" !== " ")).filter(($"2010-06" !== "") && ($"2010-06" !== " ")).filter(($"2010-07" !== "") && ($"2010-07" !== " ")).filter(($"2010-08" !== "") && ($"2010-08" !== " ")).filter(($"2010-09" !== "") && ($"2010-09" !== " ")).filter(($"2010-10" !== "") && ($"2010-10" !== " ")).filter(($"2010-11" !== "") && ($"2010-11" !== " ")).filter(($"2010-12" !== "") && ($"2010-12" !== " ")).filter(($"2011-01" !== "") && ($"2011-01" !== " ")).filter(($"2011-02" !== "") && ($"2011-02" !== " ")).filter(($"2011-03" !== "") && ($"2011-03" !== " ")).filter(($"2011-04" !== "") && ($"2011-04" !== " ")).filter(($"2011-05" !== "") && ($"2011-05" !== " ")).filter(($"2011-06" !== "") && ($"2011-06" !== " ")).filter(($"2011-07" !== "") && ($"2011-07" !== " ")).filter(($"2011-08" !== "") && ($"2011-08" !== " ")).filter(($"2011-09" !== "") && ($"2011-09" !== " ")).filter(($"2011-10" !== "") && ($"2011-10" !== " ")).filter(($"2011-11" !== "") && ($"2011-11" !== " ")).filter(($"2011-12" !== "") && ($"2011-12" !== " ")).filter(($"2012-01" !== "") && ($"2012-01" !== " ")).filter(($"2012-02" !== "") && ($"2012-02" !== " ")).filter(($"2012-03" !== "") && ($"2012-03" !== " ")).filter(($"2012-04" !== "") && ($"2012-04" !== " ")).filter(($"2012-05" !== "") && ($"2012-05" !== " ")).filter(($"2012-06" !== "") && ($"2012-06" !== " ")).filter(($"2012-07" !== "") && ($"2012-07" !== " ")).filter(($"2012-08" !== "") && ($"2012-08" !== " ")).filter(($"2012-09" !== "") && ($"2012-09" !== " ")).filter(($"2012-10" !== "") && ($"2012-10" !== " ")).filter(($"2012-11" !== "") && ($"2012-11" !== " ")).filter(($"2012-12" !== "") && ($"2012-12" !== " ")).filter(($"2013-01" !== "") && ($"2013-01" !== " ")).filter(($"2013-02" !== "") && ($"2013-02" !== " ")).filter(($"2013-03" !== "") && ($"2013-03" !== " ")).filter(($"2013-04" !== "") && ($"2013-04" !== " ")).filter(($"2013-05" !== "") && ($"2013-05" !== " ")).filter(($"2013-06" !== "") && ($"2013-06" !== " ")).filter(($"2013-07" !== "") && ($"2013-07" !== " ")).filter(($"2013-08" !== "") && ($"2013-08" !== " ")).filter(($"2013-09" !== "") && ($"2013-09" !== " ")).filter(($"2013-10" !== "") && ($"2013-10" !== " ")).filter(($"2013-11" !== "") && ($"2013-11" !== " ")).filter(($"2013-12" !== "") && ($"2013-12" !== " ")).filter(($"2014-01" !== "") && ($"2014-01" !== " ")).filter(($"2014-02" !== "") && ($"2014-02" !== " ")).filter(($"2014-03" !== "") && ($"2014-03" !== " ")).filter(($"2014-04" !== "") && ($"2014-04" !== " ")).filter(($"2014-05" !== "") && ($"2014-05" !== " ")).filter(($"2014-06" !== "") && ($"2014-06" !== " ")).filter(($"2014-07" !== "") && ($"2014-07" !== " ")).filter(($"2014-08" !== "") && ($"2014-08" !== " ")).filter(($"2014-09" !== "") && ($"2014-09" !== " ")).filter(($"2014-10" !== "") && ($"2014-10" !== " ")).filter(($"2014-11" !== "") && ($"2014-11" !== " ")).filter(($"2014-12" !== "") && ($"2014-12" !== " ")).filter(($"2015-01" !== "") && ($"2015-01" !== " ")).filter(($"2015-02" !== "") && ($"2015-02" !== " ")).filter(($"2015-03" !== "") && ($"2015-03" !== " ")).filter(($"2015-04" !== "") && ($"2015-04" !== " ")).filter(($"2015-05" !== "") && ($"2015-05" !== " ")).filter(($"2015-06" !== "") && ($"2015-06" !== " ")).filter(($"2015-07" !== "") && ($"2015-07" !== " ")).filter(($"2015-08" !== "") && ($"2015-08" !== " ")).filter(($"2015-09" !== "") && ($"2015-09" !== " ")).filter(($"2015-10" !== "") && ($"2015-10" !== " ")).filter(($"2015-11" !== "") && ($"2015-11" !== " ")).filter(($"2015-12" !== "") && ($"2015-12" !== " ")).filter(($"2016-01" !== "") && ($"2016-01" !== " ")).filter(($"2016-02" !== "") && ($"2016-02" !== " ")).filter(($"2016-03" !== "") && ($"2016-03" !== " ")).filter(($"2016-04" !== "") && ($"2016-04" !== " ")).filter(($"2016-05" !== "") && ($"2016-05" !== " ")).filter(($"2016-06" !== "") && ($"2016-06" !== " ")).filter(($"2016-07" !== "") && ($"2016-07" !== " ")).filter(($"2016-08" !== "") && ($"2016-08" !== " ")).filter(($"2016-09" !== "") && ($"2016-09" !== " ")).filter(($"2016-10" !== "") && ($"2016-10" !== " ")).filter(($"2016-11" !== "") && ($"2016-11" !== " ")).filter(($"2016-12" !== "") && ($"2016-12" !== " ")).filter(($"2017-01" !== "") && ($"2017-01" !== " ")).filter(($"2017-02" !== "") && ($"2017-02" !== " ")).filter(($"2017-03" !== "") && ($"2017-03" !== " ")).filter(($"2017-04" !== "") && ($"2017-04" !== " ")).filter(($"2017-05" !== "") && ($"2017-05" !== " ")).filter(($"2017-06" !== "") && ($"2017-06" !== " ")).filter(($"2017-07" !== "") && ($"2017-07" !== " ")).filter(($"2017-08" !== "") && ($"2017-08" !== " ")).filter(($"2017-09" !== "") && ($"2017-09" !== " ")).filter(($"2017-10" !== "") && ($"2017-10" !== " ")).filter(($"2017-11" !== "") && ($"2017-11" !== " ")).filter(($"2017-12" !== "") && ($"2017-12" !== " "))
+// cast string to float type
+scala> val priceRent = priceRentRaw2.withColumn("2010-01" , toFloat(priceRentRaw2("2010-01"))).withColumn("2010-02" , toFloat(priceRentRaw2("2010-02"))).withColumn("2010-03" , toFloat(priceRentRaw2("2010-03"))).withColumn("2010-04" , toFloat(priceRentRaw2("2010-04"))).withColumn("2010-05" , toFloat(priceRentRaw2("2010-05"))).withColumn("2010-06" , toFloat(priceRentRaw2("2010-06"))).withColumn("2010-07" , toFloat(priceRentRaw2("2010-07"))).withColumn("2010-08" , toFloat(priceRentRaw2("2010-08"))).withColumn("2010-09" , toFloat(priceRentRaw2("2010-09"))).withColumn("2010-10" , toFloat(priceRentRaw2("2010-10"))).withColumn("2010-11" , toFloat(priceRentRaw2("2010-11"))).withColumn("2010-12" , toFloat(priceRentRaw2("2010-12"))).withColumn("2011-01" , toFloat(priceRentRaw2("2011-01"))).withColumn("2011-02" , toFloat(priceRentRaw2("2011-02"))).withColumn("2011-03" , toFloat(priceRentRaw2("2011-03"))).withColumn("2011-04" , toFloat(priceRentRaw2("2011-04"))).withColumn("2011-05" , toFloat(priceRentRaw2("2011-05"))).withColumn("2011-06" , toFloat(priceRentRaw2("2011-06"))).withColumn("2011-07" , toFloat(priceRentRaw2("2011-07"))).withColumn("2011-08" , toFloat(priceRentRaw2("2011-08"))).withColumn("2011-09" , toFloat(priceRentRaw2("2011-09"))).withColumn("2011-10" , toFloat(priceRentRaw2("2011-10"))).withColumn("2011-11" , toFloat(priceRentRaw2("2011-11"))).withColumn("2011-12" , toFloat(priceRentRaw2("2011-12"))).withColumn("2012-01" , toFloat(priceRentRaw2("2012-01"))).withColumn("2012-02" , toFloat(priceRentRaw2("2012-02"))).withColumn("2012-03" , toFloat(priceRentRaw2("2012-03"))).withColumn("2012-04" , toFloat(priceRentRaw2("2012-04"))).withColumn("2012-05" , toFloat(priceRentRaw2("2012-05"))).withColumn("2012-06" , toFloat(priceRentRaw2("2012-06"))).withColumn("2012-07" , toFloat(priceRentRaw2("2012-07"))).withColumn("2012-08" , toFloat(priceRentRaw2("2012-08"))).withColumn("2012-09" , toFloat(priceRentRaw2("2012-09"))).withColumn("2012-10" , toFloat(priceRentRaw2("2012-10"))).withColumn("2012-11" , toFloat(priceRentRaw2("2012-11"))).withColumn("2012-12" , toFloat(priceRentRaw2("2012-12"))).withColumn("2013-01" , toFloat(priceRentRaw2("2013-01"))).withColumn("2013-02" , toFloat(priceRentRaw2("2013-02"))).withColumn("2013-03" , toFloat(priceRentRaw2("2013-03"))).withColumn("2013-04" , toFloat(priceRentRaw2("2013-04"))).withColumn("2013-05" , toFloat(priceRentRaw2("2013-05"))).withColumn("2013-06" , toFloat(priceRentRaw2("2013-06"))).withColumn("2013-07" , toFloat(priceRentRaw2("2013-07"))).withColumn("2013-08" , toFloat(priceRentRaw2("2013-08"))).withColumn("2013-09" , toFloat(priceRentRaw2("2013-09"))).withColumn("2013-10" , toFloat(priceRentRaw2("2013-10"))).withColumn("2013-11" , toFloat(priceRentRaw2("2013-11"))).withColumn("2013-12" , toFloat(priceRentRaw2("2013-12"))).withColumn("2014-01" , toFloat(priceRentRaw2("2014-01"))).withColumn("2014-02" , toFloat(priceRentRaw2("2014-02"))).withColumn("2014-03" , toFloat(priceRentRaw2("2014-03"))).withColumn("2014-04" , toFloat(priceRentRaw2("2014-04"))).withColumn("2014-05" , toFloat(priceRentRaw2("2014-05"))).withColumn("2014-06" , toFloat(priceRentRaw2("2014-06"))).withColumn("2014-07" , toFloat(priceRentRaw2("2014-07"))).withColumn("2014-08" , toFloat(priceRentRaw2("2014-08"))).withColumn("2014-09" , toFloat(priceRentRaw2("2014-09"))).withColumn("2014-10" , toFloat(priceRentRaw2("2014-10"))).withColumn("2014-11" , toFloat(priceRentRaw2("2014-11"))).withColumn("2014-12" , toFloat(priceRentRaw2("2014-12"))).withColumn("2015-01" , toFloat(priceRentRaw2("2015-01"))).withColumn("2015-02" , toFloat(priceRentRaw2("2015-02"))).withColumn("2015-03" , toFloat(priceRentRaw2("2015-03"))).withColumn("2015-04" , toFloat(priceRentRaw2("2015-04"))).withColumn("2015-05" , toFloat(priceRentRaw2("2015-05"))).withColumn("2015-06" , toFloat(priceRentRaw2("2015-06"))).withColumn("2015-07" , toFloat(priceRentRaw2("2015-07"))).withColumn("2015-08" , toFloat(priceRentRaw2("2015-08"))).withColumn("2015-09" , toFloat(priceRentRaw2("2015-09"))).withColumn("2015-10" , toFloat(priceRentRaw2("2015-10"))).withColumn("2015-11" , toFloat(priceRentRaw2("2015-11"))).withColumn("2015-12" , toFloat(priceRentRaw2("2015-12"))).withColumn("2016-01" , toFloat(priceRentRaw2("2016-01"))).withColumn("2016-02" , toFloat(priceRentRaw2("2016-02"))).withColumn("2016-03" , toFloat(priceRentRaw2("2016-03"))).withColumn("2016-04" , toFloat(priceRentRaw2("2016-04"))).withColumn("2016-05" , toFloat(priceRentRaw2("2016-05"))).withColumn("2016-06" , toFloat(priceRentRaw2("2016-06"))).withColumn("2016-07" , toFloat(priceRentRaw2("2016-07"))).withColumn("2016-08" , toFloat(priceRentRaw2("2016-08"))).withColumn("2016-09" , toFloat(priceRentRaw2("2016-09"))).withColumn("2016-10" , toFloat(priceRentRaw2("2016-10"))).withColumn("2016-11" , toFloat(priceRentRaw2("2016-11"))).withColumn("2016-12" , toFloat(priceRentRaw2("2016-12"))).withColumn("2017-01" , toFloat(priceRentRaw2("2017-01"))).withColumn("2017-02" , toFloat(priceRentRaw2("2017-02"))).withColumn("2017-03" , toFloat(priceRentRaw2("2017-03"))).withColumn("2017-04" , toFloat(priceRentRaw2("2017-04"))).withColumn("2017-05" , toFloat(priceRentRaw2("2017-05"))).withColumn("2017-06" , toFloat(priceRentRaw2("2017-06"))).withColumn("2017-07" , toFloat(priceRentRaw2("2017-07"))).withColumn("2017-08" , toFloat(priceRentRaw2("2017-08"))).withColumn("2017-09" , toFloat(priceRentRaw2("2017-09"))).withColumn("2017-10" , toFloat(priceRentRaw2("2017-10"))).withColumn("2017-11" , toFloat(priceRentRaw2("2017-11"))).withColumn("2017-12" , toFloat(priceRentRaw2("2017-12")))
+// count the number of rows
+scala> priceRent.count
+res25: Long = 70
+// print out schema
+scala> priceRent.printSchema
+root
+ |-- Area: string (nullable = true)
+ |-- Boro: string (nullable = true)
+ |-- AreaType: string (nullable = true)
+ |-- 2010-01: float (nullable = true)
+ |-- 2010-02: float (nullable = true)
+ |-- 2010-03: float (nullable = true)
+ |-- 2010-04: float (nullable = true)
+ |-- 2010-05: float (nullable = true)
+ |-- 2010-06: float (nullable = true)
+ |-- 2010-07: float (nullable = true)
+ |-- 2010-08: float (nullable = true)
+ |-- 2010-09: float (nullable = true)
+ |-- 2010-10: float (nullable = true)
+ |-- 2010-11: float (nullable = true)
+ |-- 2010-12: float (nullable = true)
+ |-- 2011-01: float (nullable = true)
+ |-- 2011-02: float (nullable = true)
+ |-- 2011-03: float (nullable = true)
+ |-- 2011-04: float (nullable = true)
+ |-- 2011-05: float (nullable = true)
+ |-- 2011-06: float (nullable = true)
+ |-- 2011-07: float (nullable = true)
+ |-- 2011-08: float (nullable = true)
+ |-- 2011-09: float (nullable = true)
+ |-- 2011-10: float (nullable = true)
+ |-- 2011-11: float (nullable = true)
+ |-- 2011-12: float (nullable = true)
+ |-- 2012-01: float (nullable = true)
+ |-- 2012-02: float (nullable = true)
+ |-- 2012-03: float (nullable = true)
+ |-- 2012-04: float (nullable = true)
+ |-- 2012-05: float (nullable = true)
+ |-- 2012-06: float (nullable = true)
+ |-- 2012-07: float (nullable = true)
+ |-- 2012-08: float (nullable = true)
+ |-- 2012-09: float (nullable = true)
+ |-- 2012-10: float (nullable = true)
+ |-- 2012-11: float (nullable = true)
+ |-- 2012-12: float (nullable = true)
+ |-- 2013-01: float (nullable = true)
+ |-- 2013-02: float (nullable = true)
+ |-- 2013-03: float (nullable = true)
+ |-- 2013-04: float (nullable = true)
+ |-- 2013-05: float (nullable = true)
+ |-- 2013-06: float (nullable = true)
+ |-- 2013-07: float (nullable = true)
+ |-- 2013-08: float (nullable = true)
+ |-- 2013-09: float (nullable = true)
+ |-- 2013-10: float (nullable = true)
+ |-- 2013-11: float (nullable = true)
+ |-- 2013-12: float (nullable = true)
+ |-- 2014-01: float (nullable = true)
+ |-- 2014-02: float (nullable = true)
+ |-- 2014-03: float (nullable = true)
+ |-- 2014-04: float (nullable = true)
+ |-- 2014-05: float (nullable = true)
+ |-- 2014-06: float (nullable = true)
+ |-- 2014-07: float (nullable = true)
+ |-- 2014-08: float (nullable = true)
+ |-- 2014-09: float (nullable = true)
+ |-- 2014-10: float (nullable = true)
+ |-- 2014-11: float (nullable = true)
+ |-- 2014-12: float (nullable = true)
+ |-- 2015-01: float (nullable = true)
+ |-- 2015-02: float (nullable = true)
+ |-- 2015-03: float (nullable = true)
+ |-- 2015-04: float (nullable = true)
+ |-- 2015-05: float (nullable = true)
+ |-- 2015-06: float (nullable = true)
+ |-- 2015-07: float (nullable = true)
+ |-- 2015-08: float (nullable = true)
+ |-- 2015-09: float (nullable = true)
+ |-- 2015-10: float (nullable = true)
+ |-- 2015-11: float (nullable = true)
+ |-- 2015-12: float (nullable = true)
+ |-- 2016-01: float (nullable = true)
+ |-- 2016-02: float (nullable = true)
+ |-- 2016-03: float (nullable = true)
+ |-- 2016-04: float (nullable = true)
+ |-- 2016-05: float (nullable = true)
+ |-- 2016-06: float (nullable = true)
+ |-- 2016-07: float (nullable = true)
+ |-- 2016-08: float (nullable = true)
+ |-- 2016-09: float (nullable = true)
+ |-- 2016-10: float (nullable = true)
+ |-- 2016-11: float (nullable = true)
+ |-- 2016-12: float (nullable = true)
+ |-- 2017-01: float (nullable = true)
+ |-- 2017-02: float (nullable = true)
+ |-- 2017-03: float (nullable = true)
+ |-- 2017-04: float (nullable = true)
+ |-- 2017-05: float (nullable = true)
+ |-- 2017-06: float (nullable = true)
+ |-- 2017-07: float (nullable = true)
+ |-- 2017-08: float (nullable = true)
+ |-- 2017-09: float (nullable = true)
+ |-- 2017-10: float (nullable = true)
+ |-- 2017-11: float (nullable = true)
+ |-- 2017-12: float (nullable = true)
+ |-- 2018-01: string (nullable = true)
+ |-- 2018-02: string (nullable = true)
+scala> priceRent.describe().show()
+scala> val newPriceRent = priceRent.drop(priceRent.col("2018-01")).drop(priceRent.col("2018-02"))
+
+// SalePrice
+scala> val priceSaleRaw = sqlContext.read.format("com.databricks.spark.csv").option("header", "true").load("/user/cyh359/BDAD/Project/rawData/priceData/A6_medianSalePrice_All.csv")
+scala> val priceSaleRaw2 = priceSaleRaw.filter(($"2010-01" !== "") && ($"2010-01" !== " ")).filter(($"2010-02" !== "") && ($"2010-02" !== " ")).filter(($"2010-03" !== "") && ($"2010-03" !== " ")).filter(($"2010-04" !== "") && ($"2010-04" !== " ")).filter(($"2010-05" !== "") && ($"2010-05" !== " ")).filter(($"2010-06" !== "") && ($"2010-06" !== " ")).filter(($"2010-07" !== "") && ($"2010-07" !== " ")).filter(($"2010-08" !== "") && ($"2010-08" !== " ")).filter(($"2010-09" !== "") && ($"2010-09" !== " ")).filter(($"2010-10" !== "") && ($"2010-10" !== " ")).filter(($"2010-11" !== "") && ($"2010-11" !== " ")).filter(($"2010-12" !== "") && ($"2010-12" !== " ")).filter(($"2011-01" !== "") && ($"2011-01" !== " ")).filter(($"2011-02" !== "") && ($"2011-02" !== " ")).filter(($"2011-03" !== "") && ($"2011-03" !== " ")).filter(($"2011-04" !== "") && ($"2011-04" !== " ")).filter(($"2011-05" !== "") && ($"2011-05" !== " ")).filter(($"2011-06" !== "") && ($"2011-06" !== " ")).filter(($"2011-07" !== "") && ($"2011-07" !== " ")).filter(($"2011-08" !== "") && ($"2011-08" !== " ")).filter(($"2011-09" !== "") && ($"2011-09" !== " ")).filter(($"2011-10" !== "") && ($"2011-10" !== " ")).filter(($"2011-11" !== "") && ($"2011-11" !== " ")).filter(($"2011-12" !== "") && ($"2011-12" !== " ")).filter(($"2012-01" !== "") && ($"2012-01" !== " ")).filter(($"2012-02" !== "") && ($"2012-02" !== " ")).filter(($"2012-03" !== "") && ($"2012-03" !== " ")).filter(($"2012-04" !== "") && ($"2012-04" !== " ")).filter(($"2012-05" !== "") && ($"2012-05" !== " ")).filter(($"2012-06" !== "") && ($"2012-06" !== " ")).filter(($"2012-07" !== "") && ($"2012-07" !== " ")).filter(($"2012-08" !== "") && ($"2012-08" !== " ")).filter(($"2012-09" !== "") && ($"2012-09" !== " ")).filter(($"2012-10" !== "") && ($"2012-10" !== " ")).filter(($"2012-11" !== "") && ($"2012-11" !== " ")).filter(($"2012-12" !== "") && ($"2012-12" !== " ")).filter(($"2013-01" !== "") && ($"2013-01" !== " ")).filter(($"2013-02" !== "") && ($"2013-02" !== " ")).filter(($"2013-03" !== "") && ($"2013-03" !== " ")).filter(($"2013-04" !== "") && ($"2013-04" !== " ")).filter(($"2013-05" !== "") && ($"2013-05" !== " ")).filter(($"2013-06" !== "") && ($"2013-06" !== " ")).filter(($"2013-07" !== "") && ($"2013-07" !== " ")).filter(($"2013-08" !== "") && ($"2013-08" !== " ")).filter(($"2013-09" !== "") && ($"2013-09" !== " ")).filter(($"2013-10" !== "") && ($"2013-10" !== " ")).filter(($"2013-11" !== "") && ($"2013-11" !== " ")).filter(($"2013-12" !== "") && ($"2013-12" !== " ")).filter(($"2014-01" !== "") && ($"2014-01" !== " ")).filter(($"2014-02" !== "") && ($"2014-02" !== " ")).filter(($"2014-03" !== "") && ($"2014-03" !== " ")).filter(($"2014-04" !== "") && ($"2014-04" !== " ")).filter(($"2014-05" !== "") && ($"2014-05" !== " ")).filter(($"2014-06" !== "") && ($"2014-06" !== " ")).filter(($"2014-07" !== "") && ($"2014-07" !== " ")).filter(($"2014-08" !== "") && ($"2014-08" !== " ")).filter(($"2014-09" !== "") && ($"2014-09" !== " ")).filter(($"2014-10" !== "") && ($"2014-10" !== " ")).filter(($"2014-11" !== "") && ($"2014-11" !== " ")).filter(($"2014-12" !== "") && ($"2014-12" !== " ")).filter(($"2015-01" !== "") && ($"2015-01" !== " ")).filter(($"2015-02" !== "") && ($"2015-02" !== " ")).filter(($"2015-03" !== "") && ($"2015-03" !== " ")).filter(($"2015-04" !== "") && ($"2015-04" !== " ")).filter(($"2015-05" !== "") && ($"2015-05" !== " ")).filter(($"2015-06" !== "") && ($"2015-06" !== " ")).filter(($"2015-07" !== "") && ($"2015-07" !== " ")).filter(($"2015-08" !== "") && ($"2015-08" !== " ")).filter(($"2015-09" !== "") && ($"2015-09" !== " ")).filter(($"2015-10" !== "") && ($"2015-10" !== " ")).filter(($"2015-11" !== "") && ($"2015-11" !== " ")).filter(($"2015-12" !== "") && ($"2015-12" !== " ")).filter(($"2016-01" !== "") && ($"2016-01" !== " ")).filter(($"2016-02" !== "") && ($"2016-02" !== " ")).filter(($"2016-03" !== "") && ($"2016-03" !== " ")).filter(($"2016-04" !== "") && ($"2016-04" !== " ")).filter(($"2016-05" !== "") && ($"2016-05" !== " ")).filter(($"2016-06" !== "") && ($"2016-06" !== " ")).filter(($"2016-07" !== "") && ($"2016-07" !== " ")).filter(($"2016-08" !== "") && ($"2016-08" !== " ")).filter(($"2016-09" !== "") && ($"2016-09" !== " ")).filter(($"2016-10" !== "") && ($"2016-10" !== " ")).filter(($"2016-11" !== "") && ($"2016-11" !== " ")).filter(($"2016-12" !== "") && ($"2016-12" !== " ")).filter(($"2017-01" !== "") && ($"2017-01" !== " ")).filter(($"2017-02" !== "") && ($"2017-02" !== " ")).filter(($"2017-03" !== "") && ($"2017-03" !== " ")).filter(($"2017-04" !== "") && ($"2017-04" !== " ")).filter(($"2017-05" !== "") && ($"2017-05" !== " ")).filter(($"2017-06" !== "") && ($"2017-06" !== " ")).filter(($"2017-07" !== "") && ($"2017-07" !== " ")).filter(($"2017-08" !== "") && ($"2017-08" !== " ")).filter(($"2017-09" !== "") && ($"2017-09" !== " ")).filter(($"2017-10" !== "") && ($"2017-10" !== " ")).filter(($"2017-11" !== "") && ($"2017-11" !== " ")).filter(($"2017-12" !== "") && ($"2017-12" !== " "))
+// cast string to float type
+scala> val priceSale = priceSaleRaw2.withColumn("2010-01" , toFloat(priceSaleRaw2("2010-01"))).withColumn("2010-02" , toFloat(priceSaleRaw2("2010-02"))).withColumn("2010-03" , toFloat(priceSaleRaw2("2010-03"))).withColumn("2010-04" , toFloat(priceSaleRaw2("2010-04"))).withColumn("2010-05" , toFloat(priceSaleRaw2("2010-05"))).withColumn("2010-06" , toFloat(priceSaleRaw2("2010-06"))).withColumn("2010-07" , toFloat(priceSaleRaw2("2010-07"))).withColumn("2010-08" , toFloat(priceSaleRaw2("2010-08"))).withColumn("2010-09" , toFloat(priceSaleRaw2("2010-09"))).withColumn("2010-10" , toFloat(priceSaleRaw2("2010-10"))).withColumn("2010-11" , toFloat(priceSaleRaw2("2010-11"))).withColumn("2010-12" , toFloat(priceSaleRaw2("2010-12"))).withColumn("2011-01" , toFloat(priceSaleRaw2("2011-01"))).withColumn("2011-02" , toFloat(priceSaleRaw2("2011-02"))).withColumn("2011-03" , toFloat(priceSaleRaw2("2011-03"))).withColumn("2011-04" , toFloat(priceSaleRaw2("2011-04"))).withColumn("2011-05" , toFloat(priceSaleRaw2("2011-05"))).withColumn("2011-06" , toFloat(priceSaleRaw2("2011-06"))).withColumn("2011-07" , toFloat(priceSaleRaw2("2011-07"))).withColumn("2011-08" , toFloat(priceSaleRaw2("2011-08"))).withColumn("2011-09" , toFloat(priceSaleRaw2("2011-09"))).withColumn("2011-10" , toFloat(priceSaleRaw2("2011-10"))).withColumn("2011-11" , toFloat(priceSaleRaw2("2011-11"))).withColumn("2011-12" , toFloat(priceSaleRaw2("2011-12"))).withColumn("2012-01" , toFloat(priceSaleRaw2("2012-01"))).withColumn("2012-02" , toFloat(priceSaleRaw2("2012-02"))).withColumn("2012-03" , toFloat(priceSaleRaw2("2012-03"))).withColumn("2012-04" , toFloat(priceSaleRaw2("2012-04"))).withColumn("2012-05" , toFloat(priceSaleRaw2("2012-05"))).withColumn("2012-06" , toFloat(priceSaleRaw2("2012-06"))).withColumn("2012-07" , toFloat(priceSaleRaw2("2012-07"))).withColumn("2012-08" , toFloat(priceSaleRaw2("2012-08"))).withColumn("2012-09" , toFloat(priceSaleRaw2("2012-09"))).withColumn("2012-10" , toFloat(priceSaleRaw2("2012-10"))).withColumn("2012-11" , toFloat(priceSaleRaw2("2012-11"))).withColumn("2012-12" , toFloat(priceSaleRaw2("2012-12"))).withColumn("2013-01" , toFloat(priceSaleRaw2("2013-01"))).withColumn("2013-02" , toFloat(priceSaleRaw2("2013-02"))).withColumn("2013-03" , toFloat(priceSaleRaw2("2013-03"))).withColumn("2013-04" , toFloat(priceSaleRaw2("2013-04"))).withColumn("2013-05" , toFloat(priceSaleRaw2("2013-05"))).withColumn("2013-06" , toFloat(priceSaleRaw2("2013-06"))).withColumn("2013-07" , toFloat(priceSaleRaw2("2013-07"))).withColumn("2013-08" , toFloat(priceSaleRaw2("2013-08"))).withColumn("2013-09" , toFloat(priceSaleRaw2("2013-09"))).withColumn("2013-10" , toFloat(priceSaleRaw2("2013-10"))).withColumn("2013-11" , toFloat(priceSaleRaw2("2013-11"))).withColumn("2013-12" , toFloat(priceSaleRaw2("2013-12"))).withColumn("2014-01" , toFloat(priceSaleRaw2("2014-01"))).withColumn("2014-02" , toFloat(priceSaleRaw2("2014-02"))).withColumn("2014-03" , toFloat(priceSaleRaw2("2014-03"))).withColumn("2014-04" , toFloat(priceSaleRaw2("2014-04"))).withColumn("2014-05" , toFloat(priceSaleRaw2("2014-05"))).withColumn("2014-06" , toFloat(priceSaleRaw2("2014-06"))).withColumn("2014-07" , toFloat(priceSaleRaw2("2014-07"))).withColumn("2014-08" , toFloat(priceSaleRaw2("2014-08"))).withColumn("2014-09" , toFloat(priceSaleRaw2("2014-09"))).withColumn("2014-10" , toFloat(priceSaleRaw2("2014-10"))).withColumn("2014-11" , toFloat(priceSaleRaw2("2014-11"))).withColumn("2014-12" , toFloat(priceSaleRaw2("2014-12"))).withColumn("2015-01" , toFloat(priceSaleRaw2("2015-01"))).withColumn("2015-02" , toFloat(priceSaleRaw2("2015-02"))).withColumn("2015-03" , toFloat(priceSaleRaw2("2015-03"))).withColumn("2015-04" , toFloat(priceSaleRaw2("2015-04"))).withColumn("2015-05" , toFloat(priceSaleRaw2("2015-05"))).withColumn("2015-06" , toFloat(priceSaleRaw2("2015-06"))).withColumn("2015-07" , toFloat(priceSaleRaw2("2015-07"))).withColumn("2015-08" , toFloat(priceSaleRaw2("2015-08"))).withColumn("2015-09" , toFloat(priceSaleRaw2("2015-09"))).withColumn("2015-10" , toFloat(priceSaleRaw2("2015-10"))).withColumn("2015-11" , toFloat(priceSaleRaw2("2015-11"))).withColumn("2015-12" , toFloat(priceSaleRaw2("2015-12"))).withColumn("2016-01" , toFloat(priceSaleRaw2("2016-01"))).withColumn("2016-02" , toFloat(priceSaleRaw2("2016-02"))).withColumn("2016-03" , toFloat(priceSaleRaw2("2016-03"))).withColumn("2016-04" , toFloat(priceSaleRaw2("2016-04"))).withColumn("2016-05" , toFloat(priceSaleRaw2("2016-05"))).withColumn("2016-06" , toFloat(priceSaleRaw2("2016-06"))).withColumn("2016-07" , toFloat(priceSaleRaw2("2016-07"))).withColumn("2016-08" , toFloat(priceSaleRaw2("2016-08"))).withColumn("2016-09" , toFloat(priceSaleRaw2("2016-09"))).withColumn("2016-10" , toFloat(priceSaleRaw2("2016-10"))).withColumn("2016-11" , toFloat(priceSaleRaw2("2016-11"))).withColumn("2016-12" , toFloat(priceSaleRaw2("2016-12"))).withColumn("2017-01" , toFloat(priceSaleRaw2("2017-01"))).withColumn("2017-02" , toFloat(priceSaleRaw2("2017-02"))).withColumn("2017-03" , toFloat(priceSaleRaw2("2017-03"))).withColumn("2017-04" , toFloat(priceSaleRaw2("2017-04"))).withColumn("2017-05" , toFloat(priceSaleRaw2("2017-05"))).withColumn("2017-06" , toFloat(priceSaleRaw2("2017-06"))).withColumn("2017-07" , toFloat(priceSaleRaw2("2017-07"))).withColumn("2017-08" , toFloat(priceSaleRaw2("2017-08"))).withColumn("2017-09" , toFloat(priceSaleRaw2("2017-09"))).withColumn("2017-10" , toFloat(priceSaleRaw2("2017-10"))).withColumn("2017-11" , toFloat(priceSaleRaw2("2017-11"))).withColumn("2017-12" , toFloat(priceSaleRaw2("2017-12")))
+// count the number of rows
+scala> priceSale.count
+res26: Long = 62
+// print out schema
+scala> priceSale.printSchema
+root
+ |-- Area: string (nullable = true)
+ |-- Boro: string (nullable = true)
+ |-- AreaType: string (nullable = true)
+ |-- 2010-01: float (nullable = true)
+ |-- 2010-02: float (nullable = true)
+ |-- 2010-03: float (nullable = true)
+ |-- 2010-04: float (nullable = true)
+ |-- 2010-05: float (nullable = true)
+ |-- 2010-06: float (nullable = true)
+ |-- 2010-07: float (nullable = true)
+ |-- 2010-08: float (nullable = true)
+ |-- 2010-09: float (nullable = true)
+ |-- 2010-10: float (nullable = true)
+ |-- 2010-11: float (nullable = true)
+ |-- 2010-12: float (nullable = true)
+ |-- 2011-01: float (nullable = true)
+ |-- 2011-02: float (nullable = true)
+ |-- 2011-03: float (nullable = true)
+ |-- 2011-04: float (nullable = true)
+ |-- 2011-05: float (nullable = true)
+ |-- 2011-06: float (nullable = true)
+ |-- 2011-07: float (nullable = true)
+ |-- 2011-08: float (nullable = true)
+ |-- 2011-09: float (nullable = true)
+ |-- 2011-10: float (nullable = true)
+ |-- 2011-11: float (nullable = true)
+ |-- 2011-12: float (nullable = true)
+ |-- 2012-01: float (nullable = true)
+ |-- 2012-02: float (nullable = true)
+ |-- 2012-03: float (nullable = true)
+ |-- 2012-04: float (nullable = true)
+ |-- 2012-05: float (nullable = true)
+ |-- 2012-06: float (nullable = true)
+ |-- 2012-07: float (nullable = true)
+ |-- 2012-08: float (nullable = true)
+ |-- 2012-09: float (nullable = true)
+ |-- 2012-10: float (nullable = true)
+ |-- 2012-11: float (nullable = true)
+ |-- 2012-12: float (nullable = true)
+ |-- 2013-01: float (nullable = true)
+ |-- 2013-02: float (nullable = true)
+ |-- 2013-03: float (nullable = true)
+ |-- 2013-04: float (nullable = true)
+ |-- 2013-05: float (nullable = true)
+ |-- 2013-06: float (nullable = true)
+ |-- 2013-07: float (nullable = true)
+ |-- 2013-08: float (nullable = true)
+ |-- 2013-09: float (nullable = true)
+ |-- 2013-10: float (nullable = true)
+ |-- 2013-11: float (nullable = true)
+ |-- 2013-12: float (nullable = true)
+ |-- 2014-01: float (nullable = true)
+ |-- 2014-02: float (nullable = true)
+ |-- 2014-03: float (nullable = true)
+ |-- 2014-04: float (nullable = true)
+ |-- 2014-05: float (nullable = true)
+ |-- 2014-06: float (nullable = true)
+ |-- 2014-07: float (nullable = true)
+ |-- 2014-08: float (nullable = true)
+ |-- 2014-09: float (nullable = true)
+ |-- 2014-10: float (nullable = true)
+ |-- 2014-11: float (nullable = true)
+ |-- 2014-12: float (nullable = true)
+ |-- 2015-01: float (nullable = true)
+ |-- 2015-02: float (nullable = true)
+ |-- 2015-03: float (nullable = true)
+ |-- 2015-04: float (nullable = true)
+ |-- 2015-05: float (nullable = true)
+ |-- 2015-06: float (nullable = true)
+ |-- 2015-07: float (nullable = true)
+ |-- 2015-08: float (nullable = true)
+ |-- 2015-09: float (nullable = true)
+ |-- 2015-10: float (nullable = true)
+ |-- 2015-11: float (nullable = true)
+ |-- 2015-12: float (nullable = true)
+ |-- 2016-01: float (nullable = true)
+ |-- 2016-02: float (nullable = true)
+ |-- 2016-03: float (nullable = true)
+ |-- 2016-04: float (nullable = true)
+ |-- 2016-05: float (nullable = true)
+ |-- 2016-06: float (nullable = true)
+ |-- 2016-07: float (nullable = true)
+ |-- 2016-08: float (nullable = true)
+ |-- 2016-09: float (nullable = true)
+ |-- 2016-10: float (nullable = true)
+ |-- 2016-11: float (nullable = true)
+ |-- 2016-12: float (nullable = true)
+ |-- 2017-01: float (nullable = true)
+ |-- 2017-02: float (nullable = true)
+ |-- 2017-03: float (nullable = true)
+ |-- 2017-04: float (nullable = true)
+ |-- 2017-05: float (nullable = true)
+ |-- 2017-06: float (nullable = true)
+ |-- 2017-07: float (nullable = true)
+ |-- 2017-08: float (nullable = true)
+ |-- 2017-09: float (nullable = true)
+ |-- 2017-10: float (nullable = true)
+ |-- 2017-11: float (nullable = true)
+ |-- 2017-12: float (nullable = true)
+ |-- 2018-01: string (nullable = true)
+ |-- 2018-02: string (nullable = true)
+scala> priceSale.describe().show()
+scala> val newPriceSale = priceSale.drop(priceSale.col("2018-01")).drop(priceSale.col("2018-02"))
+
+// CPI
+scala> val cpiRaw = sqlContext.read.format("com.databricks.spark.csv").option("header", "true").load("/user/cyh359/BDAD/Project/rawData/cpi.csv")
+scala> val cpi = cpiRaw.withColumn("Year" , toInt(cpiRaw("Year"))).
+withColumn("US-CPI" , toFloat(cpiRaw("US-CPI"))).
+withColumn("Percent Change Over Period US" , toFloat(cpiRaw("Percent Change Over Period US"))).
+withColumn("CPI-NYC" , toFloat(cpiRaw("CPI-NYC"))).
+withColumn("Percent Change Over Period NYC" , toFloat(cpiRaw("Percent Change Over Period NYC"))).
+select("Year" , "US-CPI" , "Percent Change Over Period US" , "CPI-NYC" , "Percent Change Over Period NYC")
+cpi.describe().show()
++-------+------------------+-----------------+-----------------------------+-----------------+------------------------------+
+|summary|              Year|           US-CPI|Percent Change Over Period US|          CPI-NYC|Percent Change Over Period NYC|
++-------+------------------+-----------------+-----------------------------+-----------------+------------------------------+
+|  count|                22|               22|                           22|               22|                            22|
+|   mean| 2002.409090909091|185.5454551523382|           0.1329090893004005|201.8045453158292|           0.13559090605386617|
+| stddev|14.892181044999953|62.07627263759797|          0.26525008316265897|69.73597458699028|            0.2535822618633993|
+|    min|              1960|             29.6|                       -0.004|             30.2|                         0.002|
+|    max|              2017|            245.1|                        1.124|            268.5|                         0.993|
++-------+------------------+-----------------+-----------------------------+-----------------+------------------------------+
+scala> cpi.printSchema
+root
+ |-- Year: integer (nullable = true)
+ |-- US-CPI: float (nullable = true)
+ |-- Percent Change Over Period US: float (nullable = true)
+ |-- CPI-NYC: float (nullable = true)
+ |-- Percent Change Over Period NYC: float (nullable = true)
+
+// Employment and Unemployment
+scala> val employmentRaw = sqlContext.read.format("com.databricks.spark.csv").option("header", "true").load("/user/cyh359/BDAD/Project/rawData/employment.csv")
+scala> val employmentRaw2 = employmentRaw.withColumn("Labor Force in K" , toFloat(employmentRaw("Labor Force in K"))).
+withColumn("Employment in K" , toFloat(employmentRaw("Employment in K"))).
+withColumn("Emp/Pop  percent" , toFloat(employmentRaw("Emp/Pop  percent"))).
+withColumn("Unemployed  in K" , toFloat(employmentRaw("Unemployed  in K"))).
+withColumn("Unemp Rate percent" , toFloat(employmentRaw("Unemp Rate percent"))).
+withColumn("LFPART percent" , toFloat(employmentRaw("LFPART percent"))).
+select("Mo-Yr" , "Labor Force in K" , "Employment in K" , "Emp/Pop  percent" , "Unemployed  in K" , "Unemp Rate percent" , "LFPART percent")
+scala> employmentRaw.describe().show()
++-------+------------------+------------------+-----------------+-----------------+------------------+------------------+
+|summary|  Labor Force in K|   Employment in K| Emp/Pop  percent| Unemployed  in K|Unemp Rate percent|    LFPART percent|
++-------+------------------+------------------+-----------------+-----------------+------------------+------------------+
+|  count|               506|               506|              506|              506|               506|               506|
+|   mean|3534.4345847872405|3260.5484184898405|53.02430834412104|273.8857709258913| 7.838932813863038|57.515612673853695|
+| stddev|379.37418059910215| 384.3257019814001|2.622858840182995|58.83577559564269|  1.82297933144957| 2.129271116050658|
+|    min|            3043.5|            2740.9|             48.5|            147.1|               4.2|              54.0|
+|    max|            4238.2|            4048.5|             58.3|            400.3|              11.6|              61.1|
++-------+------------------+------------------+-----------------+-----------------+------------------+------------------+
+scala> employmentRaw.printSchema
+root
+ |-- Mo-Yr: string (nullable = true)
+ |-- Labor Force in K: float (nullable = true)
+ |-- Employment in K: float (nullable = true)
+ |-- Emp/Pop  percent: float (nullable = true)
+ |-- Unemployed  in K: float (nullable = true)
+ |-- Unemp Rate percent: float (nullable = true)
+ |-- LFPART percent: float (nullable = true)
+
+// GDP
+scala> val gdpRaw =  sqlContext.read.format("com.databricks.spark.csv").option("header", "true").load("/user/cyh359/BDAD/Project/rawData/nyc_gdp.csv")
+scala> val GDP = gdpRaw.withColumn("Year" , toInt(gdpRaw("Year"))).
+withColumn("GDP_Billion" , toFloat(gdpRaw("GDP_Billion"))).
+select("Year", "GDP_Billion")
+scala> GDP.describe().show()
++-------+-----------------+-----------------+                                   
+|summary|             Year|      GDP_Billion|
++-------+-----------------+-----------------+
+|  count|               16|               16|
+|   mean|           2008.5|1291.948127746582|
+| stddev|4.760952285695233|215.9836656496807|
+|    min|             2001|           975.63|
+|    max|             2016|          1657.46|
++-------+-----------------+-----------------+
+scala> GDP.printSchema
+root
+ |-- Year: integer (nullable = true)
+ |-- GDP_Billion: float (nullable = true)
+
+
+// property tax rate
+// load the csv file
+scala> val taxRateRaw = sqlContext.read.format("com.databricks.spark.csv").option("header", "true").load("/user/cyh359/BDAD/Project/rawData/taxRate.csv")
+// cast the data type from string to float
+scala> 	val taxRate = taxRateRaw.withColumn("YEAR" , toInt(taxRateRaw("YEAR"))).withColumn("CLASS 1" , toFloat(taxRateRaw("CLASS 1"))).withColumn("CLASS 2" , toFloat(taxRateRaw("CLASS 2"))).withColumn("CLASS 3" , toFloat(taxRateRaw("CLASS 3"))).withColumn("CLASS 4" , toFloat(taxRateRaw("CLASS 4")))
+// profile
+scala> taxRate.describe().show()
++-------+------------------+-------------------+--------------------+--------------------+--------------------+
+|summary|              YEAR|            CLASS 1|             CLASS 2|             CLASS 3|             CLASS 4|
++-------+------------------+-------------------+--------------------+--------------------+--------------------+
+|  count|                36|                 36|                  36|                  36|                  36|
+|   mean|            1999.5| 0.1301997227387296| 0.11088222244547473| 0.10774333319730228| 0.10205138867927922|
+| stddev|10.535653752852738|0.03733895185607735|0.015786807889534078|0.019165507794563538|0.006265847801352842|
+|    min|              1982|             0.0895|              0.0895|               0.074|              0.0895|
+|    max|              2017|            0.19991|             0.13433|               0.152|             0.11558|
++-------+------------------+-------------------+--------------------+--------------------+--------------------+
+
+scala> taxRate.printSchema
+root
+ |-- YEAR: integer (nullable = true)
+ |-- CLASS 1: float (nullable = true)
+ |-- CLASS 2: float (nullable = true)
+ |-- CLASS 3: float (nullable = true)
+ |-- CLASS 4: float (nullable = true)
+
+scala> import org.apache.spark.sql.Row
+
+// merge months in the same year together by counting average
+// Rent Annualized Merge
+val newPriceRent2 = newPriceRent.select(col("Area") , col("Boro") , col("AreaType") , ((col("2010-01") + col("2010-02") + col("2010-03") + col("2010-04") + col("2010-05") + col("2010-06") + col("2010-07") + col("2010-08") + col("2010-09") + col("2010-10") + col("2010-11") + col("2010-12"))/lit(12)).alias("2010") , ((col("2011-01") + col("2011-02") + col("2011-03") + col("2011-04") + col("2011-05") + col("2011-06") + col("2011-07") + col("2011-08") + col("2011-09") + col("2011-10") + col("2011-11") + col("2011-12"))/lit(12)).alias("2011") , ((col("2012-01") + col("2012-02") + col("2012-03") + col("2012-04") + col("2012-05") + col("2012-06") + col("2012-07") + col("2012-08") + col("2012-09") + col("2012-10") + col("2012-11") + col("2012-12"))/lit(12)).alias("2012") , ((col("2013-01") + col("2013-02") + col("2013-03") + col("2013-04") + col("2013-05") + col("2013-06") + col("2013-07") + col("2013-08") + col("2013-09") + col("2013-10") + col("2013-11") + col("2013-12"))/lit(12)).alias("2013") , ((col("2014-01") + col("2014-02") + col("2014-03") + col("2014-04") + col("2014-05") + col("2014-06") + col("2014-07") + col("2014-08") + col("2014-09") + col("2014-10") + col("2014-11") + col("2014-12"))/lit(12)).alias("2014") , ((col("2015-01") + col("2015-02") + col("2015-03") + col("2015-04") + col("2015-05") + col("2015-06") + col("2015-07") + col("2015-08") + col("2015-09") + col("2015-10") + col("2015-11") + col("2015-12"))/lit(12)).alias("2015") , ((col("2016-01") + col("2016-02") + col("2016-03") + col("2016-04") + col("2016-05") + col("2016-06") + col("2016-07") + col("2016-08") + col("2016-09") + col("2016-10") + col("2016-11") + col("2016-12"))/lit(12)).alias("2016") , ((col("2017-01") + col("2017-02") + col("2017-03") + col("2017-04") + col("2017-05") + col("2017-06") + col("2017-07") + col("2017-08") + col("2017-09") + col("2017-10") + col("2017-11") + col("2017-12"))/lit(12)).alias("2017"))
+// Sale Annualized Merge
+val newPriceSale2 = newPriceSale.select(col("Area") , col("Boro") , col("AreaType") , ((col("2010-01") + col("2010-02") + col("2010-03") + col("2010-04") + col("2010-05") + col("2010-06") + col("2010-07") + col("2010-08") + col("2010-09") + col("2010-10") + col("2010-11") + col("2010-12"))/lit(12)).alias("2010") , ((col("2011-01") + col("2011-02") + col("2011-03") + col("2011-04") + col("2011-05") + col("2011-06") + col("2011-07") + col("2011-08") + col("2011-09") + col("2011-10") + col("2011-11") + col("2011-12"))/lit(12)).alias("2011") , ((col("2012-01") + col("2012-02") + col("2012-03") + col("2012-04") + col("2012-05") + col("2012-06") + col("2012-07") + col("2012-08") + col("2012-09") + col("2012-10") + col("2012-11") + col("2012-12"))/lit(12)).alias("2012") , ((col("2013-01") + col("2013-02") + col("2013-03") + col("2013-04") + col("2013-05") + col("2013-06") + col("2013-07") + col("2013-08") + col("2013-09") + col("2013-10") + col("2013-11") + col("2013-12"))/lit(12)).alias("2013") , ((col("2014-01") + col("2014-02") + col("2014-03") + col("2014-04") + col("2014-05") + col("2014-06") + col("2014-07") + col("2014-08") + col("2014-09") + col("2014-10") + col("2014-11") + col("2014-12"))/lit(12)).alias("2014") , ((col("2015-01") + col("2015-02") + col("2015-03") + col("2015-04") + col("2015-05") + col("2015-06") + col("2015-07") + col("2015-08") + col("2015-09") + col("2015-10") + col("2015-11") + col("2015-12"))/lit(12)).alias("2015") , ((col("2016-01") + col("2016-02") + col("2016-03") + col("2016-04") + col("2016-05") + col("2016-06") + col("2016-07") + col("2016-08") + col("2016-09") + col("2016-10") + col("2016-11") + col("2016-12"))/lit(12)).alias("2016") , ((col("2017-01") + col("2017-02") + col("2017-03") + col("2017-04") + col("2017-05") + col("2017-06") + col("2017-07") + col("2017-08") + col("2017-09") + col("2017-10") + col("2017-11") + col("2017-12"))/lit(12)).alias("2017"))
+
+
+// Group by Year for aggregation on employmentRaw2
+// Extract only year in timestamp and renamed column "Mo-Yr" to "Year"
+val employmentRaw3 = employmentRaw2.withColumn("Mo-Yr" , year(employmentRaw2("Mo-Yr"))).withColumnRenamed("Mo-Yr" , "Year")
+// Do mean on annual employment and unemployment
+val employment = employmentRaw3.groupBy("Year").mean().drop("avg(Year)")
+
+// convert spark SQL dataframe to MapPartitions RDD
+val priceRentRDD_pre = newPriceRent2.rdd
+val priceSaleRDD_pre = newPriceSale2.rdd
+val cpiRDD = cpi.rdd
+val employmentRDD = employment.withColumn("employment_rate" , $"avg(Employment in K)" / $"avg(Labor Force in K)").select("*").rdd // count the employment rate before convert to rdd
+val GDPRDD = GDP.rdd
+val taxRateRDD = taxRate.withColumn("AverageTaxRate" , ($"CLASS 1" + $"CLASS 2" +$"CLASS 3" +$"CLASS 4") / lit(4) ).select("*").rdd // count the average tax rate among all classes
+
+// decompose arrays of priceRent and priceSale in terms of year
+val priceRentRDD_2010 = priceRentRDD_pre.map(row => (2010 , row(0) , row(1) , row(2) , row(3)))
+val priceRentRDD_2011 = priceRentRDD_pre.map(row => (2011 , row(0) , row(1) , row(2) , row(4)))
+val priceRentRDD_2012 = priceRentRDD_pre.map(row => (2012 , row(0) , row(1) , row(2) , row(5)))
+val priceRentRDD_2013 = priceRentRDD_pre.map(row => (2013 , row(0) , row(1) , row(2) , row(6)))
+val priceRentRDD_2014 = priceRentRDD_pre.map(row => (2014 , row(0) , row(1) , row(2) , row(7)))
+val priceRentRDD_2015 = priceRentRDD_pre.map(row => (2015 , row(0) , row(1) , row(2) , row(8)))
+val priceRentRDD_2016 = priceRentRDD_pre.map(row => (2016 , row(0) , row(1) , row(2) , row(9)))
+val priceRentRDD_2017 = priceRentRDD_pre.map(row => (2017 , row(0) , row(1) , row(2) , row(10)))
+val priceRentRDD = priceRentRDD_2010 union priceRentRDD_2011 union priceRentRDD_2012 union priceRentRDD_2013 union priceRentRDD_2014 union priceRentRDD_2015 union priceRentRDD_2016 union priceRentRDD_2017
+
+val priceSaleRDD_2010 = priceSaleRDD_pre.map(row => (2010 , row(0) , row(1) , row(2) , row(3)))
+val priceSaleRDD_2011 = priceSaleRDD_pre.map(row => (2011 , row(0) , row(1) , row(2) , row(4)))
+val priceSaleRDD_2012 = priceSaleRDD_pre.map(row => (2012 , row(0) , row(1) , row(2) , row(5)))
+val priceSaleRDD_2013 = priceSaleRDD_pre.map(row => (2013 , row(0) , row(1) , row(2) , row(6)))
+val priceSaleRDD_2014 = priceSaleRDD_pre.map(row => (2014 , row(0) , row(1) , row(2) , row(7)))
+val priceSaleRDD_2015 = priceSaleRDD_pre.map(row => (2015 , row(0) , row(1) , row(2) , row(8)))
+val priceSaleRDD_2016 = priceSaleRDD_pre.map(row => (2016 , row(0) , row(1) , row(2) , row(9)))
+val priceSaleRDD_2017 = priceSaleRDD_pre.map(row => (2017 , row(0) , row(1) , row(2) , row(10)))
+val priceSaleRDD = priceSaleRDD_2010 union priceSaleRDD_2011 union priceSaleRDD_2012 union priceSaleRDD_2013 union priceSaleRDD_2014 union priceSaleRDD_2015 union priceSaleRDD_2016 union priceSaleRDD_2017
+
+
+// retain the feature which we need
+// convert type Any to exact type 
+val Rent_NYC = priceRentRDD.map(row => (row._1 , row._2.toString , row._3.toString , row._4.toString , row._5.toString.toDouble))
+val Sale_NYC = priceSaleRDD.map(row => (row._1 , row._2.toString , row._3.toString , row._4.toString , row._5.toString.toDouble))
+val CPI_NYC = cpiRDD.map(row => (row(0).toString.toInt , row(3).toString.toDouble))
+val GDP_NYC = GDPRDD.map(row => (row(0).toString.toInt , row(1).toString.toDouble))
+val EmployRate_NYC = employmentRDD.map(row => (row(0).toString.toInt , row(7).toString.toDouble))
+val taxRate_NYC = taxRateRDD.map(row => (row(0).toString.toInt , row(5).toString.toDouble))
+
+// Convert back to sql dataframe
+val RentDF = Rent_NYC.toDF("Year" , "Area" , "Boro" , "AreaType" , "Price")
+val SaleDF = Sale_NYC.toDF("Year" , "Area" , "Boro" , "AreaType" , "Price")
+val cpiDF = CPI_NYC.toDF("Year" , "CPI")
+val gdpDF = GDP_NYC.toDF("Year" , "GDP")
+val EmployRateDF = EmployRate_NYC.toDF("Year" , "EmploymentRate")
+val taxRateDF = taxRate_NYC.toDF("Year" , "taxRate")
+
+// join together
+val Rent = RentDF.join(cpiDF , "Year").join(gdpDF , "Year").join(EmployRateDF , "Year").join(taxRateDF , "Year")
+val Sale = SaleDF.join(cpiDF , "Year").join(gdpDF , "Year").join(EmployRateDF , "Year").join(taxRateDF , "Year")
+
+scala> Rent.printSchema
+root
+ |-- Year: integer (nullable = false)
+ |-- Area: string (nullable = true)
+ |-- Boro: string (nullable = true)
+ |-- AreaType: string (nullable = true)
+ |-- Price: double (nullable = false)
+ |-- CPI: double (nullable = false)
+ |-- GDP: double (nullable = false)
+ |-- EmploymentRate: double (nullable = false)
+ |-- taxRate: double (nullable = false)
+
+scala> Sale.printSchema
+root
+ |-- Year: integer (nullable = false)
+ |-- Area: string (nullable = true)
+ |-- Boro: string (nullable = true)
+ |-- AreaType: string (nullable = true)
+ |-- Price: double (nullable = false)
+ |-- CPI: double (nullable = false)
+ |-- GDP: double (nullable = false)
+ |-- EmploymentRate: double (nullable = false)
+ |-- taxRate: double (nullable = false)
+
+// Linear Regression
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.Dataset
+import org.apache.spark.ml.Pipeline
+import org.apache.spark.ml.evaluation.RegressionEvaluator
+import org.apache.spark.ml.linalg.Vectors
+import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer,VectorAssembler}
+import org.apache.spark.ml.feature.{OneHotEncoder, StringIndexer}
+import org.apache.spark.ml.regression.DecisionTreeRegressionModel
+import org.apache.spark.ml.regression.DecisionTreeRegressor
+import org.apache.spark.ml.regression.LinearRegression
+import org.apache.spark.ml.regression.{RandomForestRegressionModel, RandomForestRegressor}
+import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.functions._
+
+
+// Do linear regression on the whole NYC housing price
+// Select $"Area" === "NYC"
+val featureArray = Array("CPI" , "GDP" , "EmploymentRate" , "taxRate")
+val SaleNYC =  Sale.filter($"Area" === "NYC").select("Price" , "CPI" , "GDP" , "EmploymentRate" , "taxRate")
+val assembler = new VectorAssembler().setInputCols(featureArray).setOutputCol("features")
+val vecSaleDF: DataFrame = assembler.transform(SaleNYC)
+
+// configure linear regression parameters, predict the "Price"
+val lr1 = new LinearRegression()
+val LR_Sale_Raw = lr1.setFeaturesCol("features").setLabelCol("Price").setFitIntercept(true)
+// Parameters Regularization
+val LR_Sale_Regular = LR_Sale_Raw.setMaxIter(10).setRegParam(0.3).setElasticNetParam(0.8)
+val LR_Sale = LR_Sale_Regular
+// Fit the model
+val LR_Sale_Model = LR_Sale.fit(vecSaleDF)
+
+LR_Sale_Model.extractParamMap()
+
+res33: org.apache.spark.ml.param.ParamMap = 
+{
+	linReg_92c28e136649-elasticNetParam: 0.8,
+	linReg_92c28e136649-featuresCol: features,
+	linReg_92c28e136649-fitIntercept: true,
+	linReg_92c28e136649-labelCol: Price,
+	linReg_92c28e136649-maxIter: 10,
+	linReg_92c28e136649-predictionCol: prediction,
+	linReg_92c28e136649-regParam: 0.3,
+	linReg_92c28e136649-solver: auto,
+	linReg_92c28e136649-standardization: true,
+	linReg_92c28e136649-tol: 1.0E-6,
+	linReg_92c28e136649-weightCol: 
+}
+
+
+println(s"Coefficients: ${LR_Sale_Model.coefficients} Intercept: ${LR_Sale_Model.intercept}")
+// Coefficients:[1091.4270482783807,165.7274091063199,1039966.2279225112,-5726921.486119139] Intercept: -208458.94468347
+
+
+val predictions = LR_Sale_Model.transform(vecSaleDF)
+
+predictions.selectExpr("Price", "round(prediction,1) as prediction").show
++-----------------+-----+-------+------------------+-------------------+        
+|            Price|  CPI|    GDP|    EmploymentRate|            taxRate|
++-----------------+-----+-------+------------------+-------------------+
+|         454565.5|240.9|1340.86|0.9046545146266749|  0.133745014667511|
+|       458553.125|247.7| 1365.8|0.9090326019333709|0.13414999842643738|
+|473598.7083333333|252.6|1439.23|0.9063992979110967|0.13565750420093536|
+|        486798.25|256.8|1477.05|0.9118152382314746|0.13628749549388885|
+|511844.0833333333|260.2|1542.76|0.9275252651009018|0.13640250265598297|
+|545202.7083333334|260.6|1608.35|0.9432088360532442| 0.1345524936914444|
+|577583.3333333334|263.4|1657.46|0.9481293364547679|0.13476499915122986|
++-----------------+-----+-------+------------------+-------------------+
+
++-----------------+----------+                                                  
+|            Price|prediction|
++-----------------+----------+
+|         454565.5|  451546.0|
+|       458553.125|  465334.7|
+|473598.7083333333|  471480.2|
+|        486798.25|  484356.5|
+|511844.0833333333|  514636.5|
+|545202.7083333334|  552848.4|
+|577583.3333333334|  567943.4|
++-----------------+----------+
+
+
+// Do linear regression on the whole NYC rental price
+// Select $"Area" === "NYC"
+val featureArray = Array("CPI" , "GDP" , "EmploymentRate" , "taxRate")
+val RentNYC =  Rent.filter($"Area" === "NYC").select("Price" , "CPI" , "GDP" , "EmploymentRate" , "taxRate")
+val assembler = new VectorAssembler().setInputCols(featureArray).setOutputCol("features")
+val vecRentDF: DataFrame = assembler.transform(RentNYC)
+
+// configure linear regression parameters, predict the "Price"
+val lr1 = new LinearRegression()
+val LR_Rent_Raw = lr1.setFeaturesCol("features").setLabelCol("Price").setFitIntercept(true)
+// Parameters Regularization
+val LR_Rent_Regular = LR_Rent_Raw.setMaxIter(10).setRegParam(0.3).setElasticNetParam(0.8)
+val LR_Rent = LR_Rent_Regular
+// Fit the model
+val LR_Rent_Model = LR_Rent.fit(vecRentDF)
+
+LR_Rent_Model.extractParamMap()
+res38: org.apache.spark.ml.param.ParamMap = 
+{
+	linReg_038ea39e1cca-elasticNetParam: 0.8,
+	linReg_038ea39e1cca-featuresCol: features,
+	linReg_038ea39e1cca-fitIntercept: true,
+	linReg_038ea39e1cca-labelCol: Price,
+	linReg_038ea39e1cca-maxIter: 10,
+	linReg_038ea39e1cca-predictionCol: prediction,
+	linReg_038ea39e1cca-regParam: 0.3,
+	linReg_038ea39e1cca-solver: auto,
+	linReg_038ea39e1cca-standardization: true,
+	linReg_038ea39e1cca-tol: 1.0E-6,
+	linReg_038ea39e1cca-weightCol: 
+}
+
+
+println(s"Coefficients: ${LR_Rent_Model.coefficients} Intercept: ${LR_Rent_Model.intercept}")
+Coefficients: [10.589805354979298,0.031920256159639726,-3226.363655775778,21330.694059291323] Intercept: 239.77645898174342
+
+
+val predictions = LR_Rent_Model.transform(vecRentDF)
+
+predictions.selectExpr("Price", "round(prediction,1) as prediction").show
+
++------------------+----------+                                                 
+|             Price|prediction|
++------------------+----------+
+|2720.5833333333335|    2767.8|
+|2882.9166666666665|    2835.1|
+|2996.1666666666665|    2930.0|
+|2989.0833333333335|    2971.6|
+|2881.1666666666665|    2961.5|
+|2864.0833333333335|    2877.8|
+|            2907.5|    2897.7|
++------------------+----------+
+
+
+
+// Output Rent and Sale dataframes as CSV file to HDFS
+scala> Rent.write.format("csv").save("/user/cyh359/BDAD/Project/Rent")
+scala> Sale.write.format("csv").save("/user/cyh359/BDAD/Project/Sale")
+
+// Output all the folders to NYU DUMBO
+$ hdfs dfs -get BDAD/Project/Sale Sale
+$ hdfs dfs -get BDAD/Project/Rent Rent
+
+// Merge all divided csv file to one csv file
+$ cd Sale
+$ cat part-00179.csv part-00180.csv part-00181.csv part-00182.csv part-00183.csv part-00184.csv part-00185.csv > Sale.csv
+$ cd ..
+$ cd Rent
+$ cat part-00179.csv part-00180.csv part-00181.csv part-00182.csv part-00183.csv part-00184.csv part-00185.csv > Rent.csv
+
+// The rest is data visualization
